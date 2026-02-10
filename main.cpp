@@ -1,80 +1,62 @@
-#include <bits/stdc++.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL2_gfx.h>
-#include <c++/iostream>
-using namespace std; //estefade konim ?
+#include <iostream>
 
-int main( int argc, char* argv[])
+int main(int argc, char** argv)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
-//    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS)!=0){
-//        cerr<<SDL_GetError();
-//        return -1;
-//    }
-    TTF_Init();
-//    if(TTF_Init()!=0){
-//        cerr<<SDL_GetError();
-//        return -1;
-//    }
+    (void)argc; (void)argv;
 
-    SDL_Rect Available_Screen;
-    SDL_GetDisplayUsableBounds(0,&Available_Screen);
-    const int W=Available_Screen.w;
-    const int H=Available_Screen.h;
-    SDL_Window* window;
-    Uint32 WND_flags =  SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE ;
-    window=SDL_CreateWindow("Scratch",Available_Screen.x,Available_Screen.y,W,H,WND_flags);
-//    if(!window){
-//        cerr<<SDL_GetError();
-//        return -1;
-//    }
-
-    SDL_Renderer *renderer;
-    renderer= SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-//    if(!renderer){
-//        cerr<<SDL_GetError();
-//        return -1;
-//    }
-
-    SDL_RaiseWindow(window);
-    Uint8 x=255;
-    int rmainBackgroundColor ,gmainBackgroundColor;
-    int bmainBackgroundColor;
-    int amainBackgroundColor;
-    int rtitleBarColor;
-    int gtitleBarColor;
-    int btitleBarColor;
-    int atitleBarColor;
-    int rmenuBarColor;
-    int gmenuBarColor;
-    int bmenuBarColor;
-    int amenuBarColor;
-    SDL_Color mainBackgroundColor={255,255,x,255};
-    SDL_Color titleBarColor={0,0,x,255};
-    SDL_Color menuBarColor={0,0,255,255};
-
-    SDL_SetRenderDrawColor(renderer,mainBackgroundColor.r,mainBackgroundColor.g,mainBackgroundColor.b,mainBackgroundColor.a);
-    SDL_SetRE
-    SDL_RenderClear(renderer);
-    aalineRGBA(renderer,0,H,W,H,255,255,255,255);
-    aalineRGBA(renderer,0,H-1,W,H-1,255,0,0,255);
-    SDL_RenderPresent(renderer);
-
-
-    SDL_Event* e=new SDL_Event();
-    SDL_PollEvent(e);
-    while(e->key.keysym.sym!=SDLK_ESCAPE)
-    {
-        SDL_PollEvent(e);
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        std::cerr << "SDL_Init error: " << SDL_GetError() << "\n";
+        return 1;
     }
 
+    SDL_Window* window = SDL_CreateWindow(
+            "ScratchProject",
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            1280, 720,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE   // ❗ بدون BORDERLESS
+    );
 
-    SDL_DestroyWindow(window);
+    if (!window) {
+        std::cerr << "SDL_CreateWindow error: " << SDL_GetError() << "\n";
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(
+            window,
+            -1,
+            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    );
+
+    if (!renderer) {
+        std::cerr << "SDL_CreateRenderer error: " << SDL_GetError() << "\n";
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    bool running = true;
+    SDL_Event e;
+
+    while (running) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                running = false;   // دکمه X این event رو می‌فرسته
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 30, 30, 35, 255);
+        SDL_RenderClear(renderer);
+
+        // اینجا بعداً Menu bar / UI خودت رو می‌کشی
+
+        SDL_RenderPresent(renderer);
+    }
+
     SDL_DestroyRenderer(renderer);
-    TTF_Quit();
+    SDL_DestroyWindow(window);
     SDL_Quit();
-
     return 0;
 }
